@@ -1,0 +1,7 @@
+.metals/
+.bsp/
+.scala-build/
+.vscode/
+.builds/
+examples/
+wacc_examples/

@@ -1,0 +1,36 @@
+stages:
+  - build
+  - unit_test
+  - integration_test
+
+build_job:
+  stage: build
+  script:
+    - scala compile . --server=false
+
+unit_test_job:
+  stage: unit_test
+  needs:
+    - build_job
+  script:
+    - scala-cli test . --server=false --test-only 'unit_test*'
+
+frontend_integration_test_job:
+  stage: integration_test
+  needs:
+    - build_job
+    - unit_test_job
+  script:
+    - git clone https://gitlab.doc.ic.ac.uk/teaching-fellows/wacc/examples.git wacc_examples
+    - scala-cli test . --server=false --test-only 'integration_test_frontend*'
+
+backend_integration_test_job:
+  stage: integration_test
+  needs:
+    - build_job
+    - unit_test_job
+    - frontend_integration_test_job
+  script:
+    - export PATH=$PATH:/usr/bin
+    - git clone https://gitlab.doc.ic.ac.uk/teaching-fellows/wacc/examples.git wacc_examples
+    - scala-cli test . --server=false --test-only 'integration_test_backend*'
